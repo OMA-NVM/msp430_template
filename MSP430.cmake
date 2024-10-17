@@ -1,7 +1,7 @@
 message("Loading MSP430 Toolchain File...")
 
 set(CMAKE_SYSTEM_NAME Generic)
-set(TOOLS_ROOT $ENV{HOME}/ti/msp430-gcc)
+set(TOOLS_ROOT ${CMAKE_SOURCE_DIR}/msp430-gcc)
 
 set(CMAKE_C_COMPILER ${TOOLS_ROOT}/bin/msp430-elf-gcc CACHE STRING "MSP C Compiler")
 set(CMAKE_CXX_COMPILER ${TOOLS_ROOT}/bin/msp430-elf-g++ CACHE STRING "MSP C++ Compiler")
@@ -16,7 +16,7 @@ function(msp430_add_executable EXECUTABLE)
 
 	# compile and link elf file
 	add_executable(${EXECUTABLE} ${ARGN})
-	set_target_properties(${EXECUTABLE} PROPERTIES 
+	set_target_properties(${EXECUTABLE} PROPERTIES
 		COMPILE_FLAGS "-mmcu=${MSP430_DEVICE_NAME} ${MSP430_COMPILER_FLAGS}"
 		LINK_FLAGS "-mmcu=${MSP430_DEVICE_NAME} ${MSP430_LINKER_FLAGS}")
     target_include_directories(${EXECUTABLE} PRIVATE

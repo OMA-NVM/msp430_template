@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>Command Options - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Commands.html#Commands" title="Commands">
+<link rel="prev" href="Completion.html#Completion" title="Completion">
+<link rel="next" href="Help.html#Help" title="Help">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988-2020 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="Command-Options"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Help.html#Help">Help</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Completion.html#Completion">Completion</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Commands.html#Commands">Commands</a>
+<hr>
+</div>
+
+<h3 class="section">3.4 Command options</h3>
+
+<p><a name="index-command-options-103"></a>Some commands accept options starting with a leading dash.  For
+example, <code>print -pretty</code>.  Similarly to command names, you can
+abbreviate a <span class="sc">gdb</span> option to the first few letters of the
+option name, if that abbreviation is unambiguous, and you can also use
+the &lt;TAB&gt; key to get <span class="sc">gdb</span> to fill out the rest of a word
+in an option (or to show you the alternatives available, if there is
+more than one possibility).
+
+   <p><a name="index-command-options_002c-raw-input-104"></a>Some commands take raw input as argument.  For example, the print
+command processes arbitrary expressions in any of the languages
+supported by <span class="sc">gdb</span>.  With such commands, because raw input may
+start with a leading dash that would be confused with an option or any
+of its abbreviations, e.g. <code>print -p</code> (short for <code>print
+-pretty</code> or printing negative <code>p</code>?), if you specify any command
+option, then you must use a double-dash (<code>--</code>) delimiter to
+indicate the end of options.
+
+   <p><a name="index-command-options_002c-boolean-105"></a>
+Some options are described as accepting an argument which can be
+either <code>on</code> or <code>off</code>.  These are known as <dfn>boolean
+options</dfn>.  Similarly to boolean settings commands&mdash;<code>on</code> and
+<code>off</code> are the typical values, but any of <code>1</code>, <code>yes</code> and
+<code>enable</code> can also be used as &ldquo;true&rdquo; value, and any of <code>0</code>,
+<code>no</code> and <code>disable</code> can also be used as &ldquo;false&rdquo; value.  You
+can also omit a &ldquo;true&rdquo; value, as it is implied by default.
+
+   <p>For example, these are equivalent:
+
+<pre class="smallexample">     (gdb) print -object on -pretty off -element unlimited -- *myptr
+     (gdb) p -o -p 0 -e u -- *myptr
+</pre>
+   <p>You can discover the set of options some command accepts by completing
+on <code>-</code> after the command name.  For example:
+
+<pre class="smallexample">     (gdb) print -&lt;TAB&gt;&lt;TAB&gt;
+     -address         -max-depth       -raw-values      -union
+     -array           -null-stop       -repeats         -vtbl
+     -array-indexes   -object          -static-members
+     -elements        -pretty          -symbol
+</pre>
+   <p>Completion will in some cases guide you with a suggestion of what kind
+of argument an option expects.  For example:
+
+<pre class="smallexample">     (gdb) print -elements &lt;TAB&gt;&lt;TAB&gt;
+     NUMBER     unlimited
+</pre>
+   <p>Here, the option expects a number (e.g., <code>100</code>), not literal
+<code>NUMBER</code>.  Such metasyntactical arguments are always presented in
+uppercase.
+
+   <p>(For more on using the <code>print</code> command, see <a href="Data.html#Data">Examining Data</a>.)
+
+   </body></html>
+

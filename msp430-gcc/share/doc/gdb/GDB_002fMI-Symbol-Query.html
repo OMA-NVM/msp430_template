@@ -1,0 +1,520 @@
+<html lang="en">
+<head>
+<title>GDB/MI Symbol Query - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Tracepoint-Commands.html#GDB_002fMI-Tracepoint-Commands" title="GDB/MI Tracepoint Commands">
+<link rel="next" href="GDB_002fMI-File-Commands.html#GDB_002fMI-File-Commands" title="GDB/MI File Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988-2020 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="GDB%2fMI-Symbol-Query"></a>
+<a name="GDB_002fMI-Symbol-Query"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-File-Commands.html#GDB_002fMI-File-Commands">GDB/MI File Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Tracepoint-Commands.html#GDB_002fMI-Tracepoint-Commands">GDB/MI Tracepoint Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.18 <span class="sc">gdb/mi</span> Symbol Query Commands</h3>
+
+<h4 class="subheading">The <code>-symbol-info-functions</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dfunctions-3128"></a><a name="g_t_002dsymbol_002dinfo_002dfunctions"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-functions [--include-nondebug]
+                             [--type <var>type_regexp</var>]
+                             [--name <var>name_regexp</var>]
+                             [--max-results <var>limit</var>]
+</pre>
+<p class="noindent">Return a list containing the names and types for all global functions
+taken from the debug information.  The functions are grouped by source
+file, and shown with the line number on which each function is
+defined.
+
+   <p>The <code>--include-nondebug</code> option causes the output to include
+code symbols from the symbol table.
+
+   <p>The options <code>--type</code> and <code>--name</code> allow the symbols returned
+to be filtered based on either the name of the function, or the type
+signature of the function.
+
+   <p>The option <code>--max-results</code> restricts the command to return no
+more than <var>limit</var> results.  If exactly <var>limit</var> results are
+returned then there might be additional results available if a higher
+limit is used.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info functions</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-functions
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="36", name="f4", type="void (int *)",
+                     description="void f4(int *);"},
+                    {line="42", name="main", type="int ()",
+                     description="int main();"},
+                    {line="30", name="f1", type="my_int_t (int, int)",
+                     description="static my_int_t f1(int, int);"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="33", name="f2", type="float (another_float_t)",
+                     description="float f2(another_float_t);"},
+                    {line="39", name="f3", type="int (another_int_t)",
+                     description="int f3(another_int_t);"},
+                    {line="27", name="f1", type="another_float_t (int)",
+                     description="static another_float_t f1(int);"}]}]}
+     (gdb)
+     -symbol-info-functions --name f1
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="30", name="f1", type="my_int_t (int, int)",
+                     description="static my_int_t f1(int, int);"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="27", name="f1", type="another_float_t (int)",
+                     description="static another_float_t f1(int);"}]}]}
+     (gdb)
+     -symbol-info-functions --type void
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="36", name="f4", type="void (int *)",
+                     description="void f4(int *);"}]}]}
+     (gdb)
+     -symbol-info-functions --include-nondebug
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="36", name="f4", type="void (int *)",
+                     description="void f4(int *);"},
+                    {line="42", name="main", type="int ()",
+                     description="int main();"},
+                    {line="30", name="f1", type="my_int_t (int, int)",
+                     description="static my_int_t f1(int, int);"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="33", name="f2", type="float (another_float_t)",
+                     description="float f2(another_float_t);"},
+                    {line="39", name="f3", type="int (another_int_t)",
+                     description="int f3(another_int_t);"},
+                    {line="27", name="f1", type="another_float_t (int)",
+                     description="static another_float_t f1(int);"}]}],
+        nondebug=
+         [{address="0x0000000000400398",name="_init"},
+          {address="0x00000000004003b0",name="_start"},
+           ...
+         ]}
+</pre>
+<h4 class="subheading">The <code>-symbol-info-module-functions</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dmodule_002dfunctions-3129"></a><a name="g_t_002dsymbol_002dinfo_002dmodule_002dfunctions"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-module-functions [--module <var>module_regexp</var>]
+                                    [--name <var>name_regexp</var>]
+                                    [--type <var>type_regexp</var>]
+</pre>
+<p class="noindent">Return a list containing the names of all known functions within all
+know Fortran modules.  The functions are grouped by source file and
+containing module, and shown with the line number on which each
+function is defined.
+
+   <p>The option <code>--module</code> only returns results for modules matching
+<var>module_regexp</var>.  The option <code>--name</code> only returns functions
+whose name matches <var>name_regexp</var>, and <code>--type</code> only returns
+functions whose type matches <var>type_regexp</var>.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info module functions</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-module-functions
+     ^done,symbols=
+       [{module="mod1",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 symbols=[{line="21",name="mod1::check_all",type="void (void)",
+                           description="void mod1::check_all(void);"}]}]},
+         {module="mod2",
+          files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                  fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                  symbols=[{line="30",name="mod2::check_var_i",type="void (void)",
+                            description="void mod2::check_var_i(void);"}]}]},
+         {module="mod3",
+          files=[{filename="/projec/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  fullname="/projec/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  symbols=[{line="21",name="mod3::check_all",type="void (void)",
+                            description="void mod3::check_all(void);"},
+                           {line="27",name="mod3::check_mod2",type="void (void)",
+                            description="void mod3::check_mod2(void);"}]}]},
+         {module="modmany",
+          files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  symbols=[{line="35",name="modmany::check_some",type="void (void)",
+                            description="void modmany::check_some(void);"}]}]},
+         {module="moduse",
+          files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                  symbols=[{line="44",name="moduse::check_all",type="void (void)",
+                            description="void moduse::check_all(void);"},
+                           {line="49",name="moduse::check_var_x",type="void (void)",
+                            description="void moduse::check_var_x(void);"}]}]}]
+</pre>
+<h4 class="subheading">The <code>-symbol-info-module-variables</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dmodule_002dvariables-3130"></a><a name="g_t_002dsymbol_002dinfo_002dmodule_002dvariables"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-module-variables [--module <var>module_regexp</var>]
+                                    [--name <var>name_regexp</var>]
+                                    [--type <var>type_regexp</var>]
+</pre>
+<p class="noindent">Return a list containing the names of all known variables within all
+know Fortran modules.  The variables are grouped by source file and
+containing module, and shown with the line number on which each
+variable is defined.
+
+   <p>The option <code>--module</code> only returns results for modules matching
+<var>module_regexp</var>.  The option <code>--name</code> only returns variables
+whose name matches <var>name_regexp</var>, and <code>--type</code> only returns
+variables whose type matches <var>type_regexp</var>.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info module variables</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-module-variables
+     ^done,symbols=
+       [{module="mod1",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 symbols=[{line="18",name="mod1::var_const",type="integer(kind=4)",
+                           description="integer(kind=4) mod1::var_const;"},
+                          {line="17",name="mod1::var_i",type="integer(kind=4)",
+                           description="integer(kind=4) mod1::var_i;"}]}]},
+        {module="mod2",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+                 symbols=[{line="28",name="mod2::var_i",type="integer(kind=4)",
+                           description="integer(kind=4) mod2::var_i;"}]}]},
+        {module="mod3",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 symbols=[{line="18",name="mod3::mod1",type="integer(kind=4)",
+                           description="integer(kind=4) mod3::mod1;"},
+                          {line="17",name="mod3::mod2",type="integer(kind=4)",
+                           description="integer(kind=4) mod3::mod2;"},
+                          {line="19",name="mod3::var_i",type="integer(kind=4)",
+                           description="integer(kind=4) mod3::var_i;"}]}]},
+        {module="modmany",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 symbols=[{line="33",name="modmany::var_a",type="integer(kind=4)",
+                           description="integer(kind=4) modmany::var_a;"},
+                          {line="33",name="modmany::var_b",type="integer(kind=4)",
+                           description="integer(kind=4) modmany::var_b;"},
+                          {line="33",name="modmany::var_c",type="integer(kind=4)",
+                           description="integer(kind=4) modmany::var_c;"},
+                          {line="33",name="modmany::var_i",type="integer(kind=4)",
+                           description="integer(kind=4) modmany::var_i;"}]}]},
+        {module="moduse",
+         files=[{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+                 symbols=[{line="42",name="moduse::var_x",type="integer(kind=4)",
+                           description="integer(kind=4) moduse::var_x;"},
+                          {line="42",name="moduse::var_y",type="integer(kind=4)",
+                           description="integer(kind=4) moduse::var_y;"}]}]}]
+</pre>
+<h4 class="subheading">The <code>-symbol-info-modules</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dmodules-3131"></a><a name="g_t_002dsymbol_002dinfo_002dmodules"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-modules [--name <var>name_regexp</var>]
+                           [--max-results <var>limit</var>]
+     
+</pre>
+<p class="noindent">Return a list containing the names of all known Fortran modules.  The
+modules are grouped by source file, and shown with the line number on
+which each modules is defined.
+
+   <p>The option <code>--name</code> allows the modules returned to be filtered
+based the name of the module.
+
+   <p>The option <code>--max-results</code> restricts the command to return no
+more than <var>limit</var> results.  If exactly <var>limit</var> results are
+returned then there might be additional results available if a higher
+limit is used.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info modules</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-modules
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+           symbols=[{line="16",name="mod1"},
+                    {line="22",name="mod2"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+           symbols=[{line="16",name="mod3"},
+                    {line="22",name="modmany"},
+                    {line="26",name="moduse"}]}]}
+     (gdb)
+     -symbol-info-modules --name mod[123]
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules-2.f90",
+           symbols=[{line="16",name="mod1"},
+                    {line="22",name="mod2"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-fortran-modules.f90",
+           symbols=[{line="16",name="mod3"}]}]}
+</pre>
+<h4 class="subheading">The <code>-symbol-info-types</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dtypes-3132"></a><a name="g_t_002dsymbol_002dinfo_002dtypes"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-types [--name <var>name_regexp</var>]
+                         [--max-results <var>limit</var>]
+     
+</pre>
+<p class="noindent">Return a list of all defined types.  The types are grouped by source
+file, and shown with the line number on which each user defined type
+is defined.  Some base types are not defined in the source code but
+are added to the debug information by the compiler, for example
+<code>int</code>, <code>float</code>, etc.; these types do not have an associated
+line number.
+
+   <p>The option <code>--name</code> allows the list of types returned to be
+filtered by name.
+
+   <p>The option <code>--max-results</code> restricts the command to return no
+more than <var>limit</var> results.  If exactly <var>limit</var> results are
+returned then there might be additional results available if a higher
+limit is used.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info types</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-types
+     ^done,symbols=
+       {debug=
+          [{filename="gdb.mi/mi-sym-info-1.c",
+            fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+            symbols=[{name="float"},
+                     {name="int"},
+                     {line="27",name="typedef int my_int_t;"}]},
+           {filename="gdb.mi/mi-sym-info-2.c",
+            fullname="/project/gdb.mi/mi-sym-info-2.c",
+            symbols=[{line="24",name="typedef float another_float_t;"},
+                     {line="23",name="typedef int another_int_t;"},
+                     {name="float"},
+                     {name="int"}]}]}
+     (gdb)
+     -symbol-info-types --name _int_
+     ^done,symbols=
+       {debug=
+          [{filename="gdb.mi/mi-sym-info-1.c",
+            fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+            symbols=[{line="27",name="typedef int my_int_t;"}]},
+           {filename="gdb.mi/mi-sym-info-2.c",
+            fullname="/project/gdb.mi/mi-sym-info-2.c",
+            symbols=[{line="23",name="typedef int another_int_t;"}]}]}
+</pre>
+<h4 class="subheading">The <code>-symbol-info-variables</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dinfo_002dvariables-3133"></a><a name="g_t_002dsymbol_002dinfo_002dvariables"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-info-variables [--include-nondebug]
+                             [--type <var>type_regexp</var>]
+                             [--name <var>name_regexp</var>]
+                             [--max-results <var>limit</var>]
+     
+</pre>
+<p class="noindent">Return a list containing the names and types for all global variables
+taken from the debug information.  The variables are grouped by source
+file, and shown with the line number on which each variable is
+defined.
+
+   <p>The <code>--include-nondebug</code> option causes the output to include
+data symbols from the symbol table.
+
+   <p>The options <code>--type</code> and <code>--name</code> allow the symbols returned
+to be filtered based on either the name of the variable, or the type
+of the variable.
+
+   <p>The option <code>--max-results</code> restricts the command to return no
+more than <var>limit</var> results.  If exactly <var>limit</var> results are
+returned then there might be additional results available if a higher
+limit is used.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is `<samp><span class="samp">info variables</span></samp>'.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-info-variables
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="25",name="global_f1",type="float",
+                     description="static float global_f1;"},
+                    {line="24",name="global_i1",type="int",
+                     description="static int global_i1;"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="21",name="global_f2",type="int",
+                     description="int global_f2;"},
+                    {line="20",name="global_i2",type="int",
+                     description="int global_i2;"},
+                    {line="19",name="global_f1",type="float",
+                     description="static float global_f1;"},
+                    {line="18",name="global_i1",type="int",
+                     description="static int global_i1;"}]}]}
+     (gdb)
+     -symbol-info-variables --name f1
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="25",name="global_f1",type="float",
+                     description="static float global_f1;"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="19",name="global_f1",type="float",
+                     description="static float global_f1;"}]}]}
+     (gdb)
+     -symbol-info-variables --type float
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="25",name="global_f1",type="float",
+                     description="static float global_f1;"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="19",name="global_f1",type="float",
+                     description="static float global_f1;"}]}]}
+     (gdb)
+     -symbol-info-variables --include-nondebug
+     ^done,symbols=
+       {debug=
+         [{filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-1.c",
+           symbols=[{line="25",name="global_f1",type="float",
+                     description="static float global_f1;"},
+                    {line="24",name="global_i1",type="int",
+                     description="static int global_i1;"}]},
+          {filename="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           fullname="/project/gdb/testsuite/gdb.mi/mi-sym-info-2.c",
+           symbols=[{line="21",name="global_f2",type="int",
+                     description="int global_f2;"},
+                    {line="20",name="global_i2",type="int",
+                     description="int global_i2;"},
+                    {line="19",name="global_f1",type="float",
+                     description="static float global_f1;"},
+                    {line="18",name="global_i1",type="int",
+                     description="static int global_i1;"}]}],
+        nondebug=
+         [{address="0x00000000004005d0",name="_IO_stdin_used"},
+          {address="0x00000000004005d8",name="__dso_handle"}
+           ...
+         ]}
+</pre>
+<h4 class="subheading">The <code>-symbol-list-lines</code> Command</h4>
+
+<p><a name="index-g_t_002dsymbol_002dlist_002dlines-3134"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -symbol-list-lines <var>filename</var>
+</pre>
+   <p>Print the list of lines that contain code and their associated program
+addresses for the given source filename.  The entries are sorted in
+ascending PC order.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>There is no corresponding <span class="sc">gdb</span> command.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -symbol-list-lines basics.c
+     ^done,lines=[{pc="0x08048554",line="7"},{pc="0x0804855a",line="8"}]
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+</body></html>
+

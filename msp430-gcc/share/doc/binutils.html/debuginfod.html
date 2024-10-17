@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+<title>debuginfod - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Selecting-the-Target-System.html#Selecting-the-Target-System" title="Selecting the Target System">
+<link rel="next" href="Reporting-Bugs.html#Reporting-Bugs" title="Reporting Bugs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991-2020 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<p>
+<a name="debuginfod"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Selecting-the-Target-System.html#Selecting-the-Target-System">Selecting the Target System</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">18 debuginfod</h2>
+
+<p><a name="index-separate-debug-files-174"></a>
+debuginfod is a web service that indexes ELF/DWARF debugging resources
+by build-id and serves them over HTTP.
+
+   <p>Binutils can be built with the debuginfod client library
+<code>libdebuginfod</code> using the <samp><span class="option">--with-debuginfod</span></samp> configure option. 
+This option is enabled by default if <code>libdebuginfod</code> is installed
+and found at configure time. This allows <samp><span class="command">objdump</span></samp> and
+<samp><span class="command">readelf</span></samp> to automatically query debuginfod servers for
+separate debug files when the files are otherwise not found.
+
+   <p>debuginfod is packaged with elfutils, starting with version 0.178. 
+You can get the latest version from `https://sourceware.org/elfutils/'.
+
+   </body></html>
+
