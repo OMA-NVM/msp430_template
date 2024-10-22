@@ -3,8 +3,8 @@
     "tasks": [
         {
             "label": "Upload Target to MSP",
-            "type":"shell",
-            "command": "${workspaceFolder}/mspdebug.sh --allow-fw-update tilib \"prog ${command:cmake.launchTargetPath}\"",
+            "type": "shell",
+            "command": "cd MSPFlasher* ; ./MSP430Flasher -w ../build/TemplateProject-v1.0.0.hex -v -g -z [VCC]",
             "group": "none",
             "presentation": {
                 "reveal": "always",
@@ -13,7 +13,35 @@
                 "clear": true,
                 "focus": true
             },
-            "problemMatcher":[]
+            "problemMatcher": []
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cd ${workspaceFolder}/build ; rm *.elf ; rm *.hex ; make ; ${workspaceFolder}/msp430-gcc/bin/msp430-elf-objcopy -O ihex ${workspaceFolder}/build/TemplateProject-v1.0.0.elf TemplateProject-v1.0.0.hex",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "config",
+            "type": "shell",
+            "command": "mkdir ${workspaceFolder}/build ; cd build ; cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "rm -rf ${workspaceFolder}/build ; rm compile_commands.json",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
         }
     ]
 }
