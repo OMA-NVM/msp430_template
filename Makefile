@@ -1,6 +1,6 @@
 CROSS_COMPILER=./msp430-gcc/bin/msp430-elf
-IR_TOOLCHAIN=./../llvm-project/build/bin/
-MSP_FLASHER_PATH=./MSP430Flasher_1.3.20/
+IR_TOOLCHAIN=./../llvm-project/build/bin
+MSP_FLASHER_PATH=./MSPFlasher_1.3.20
 MSP_INCLUDES=msp430-gcc/include
 MSP_DEVICE=msp430fr5994
 
@@ -38,7 +38,7 @@ default: create_build_dirs $(TARGET_APP).hex
 # Step 1: Convert .c to .ll using clang (C -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.c
 	@echo "C		$< -> $@"
-	@$(IR_TOOLCHAIN)clang $(CCFLAGS) $< -o $@
+	@$(IR_TOOLCHAIN)/clang $(CCFLAGS) $< -o $@
 
 # Step 1: use clang++ to generate .ll from headers (C++ -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.cpp %.h $(ALL_DEPS)
@@ -48,12 +48,12 @@ $(BUILD_DIR)/%.ll : %.cpp %.h $(ALL_DEPS)
 # Step 1: use clang++ to generate .ll from .c++ (C++ -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.cpp $(ALL_DEPS)
 	@echo "CXX		$< -> $@"
-	@$(IR_TOOLCHAIN)clang++ $(CCFLAGS) -c $< -o $@
+	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) -c $< -o $@
 
 # Step 2: Convert .ll to .S using llc (LLVM IR -> Assembly)
 $(BUILD_DIR)/%.S: $(BUILD_DIR)/%.ll
 	@echo "LLC		$< -> $@"
-	@$(IR_TOOLCHAIN)llc $(LLCFLAGS) $< -o $@ $(IR_OBJECTS)
+	@$(IR_TOOLCHAIN)/llc $(LLCFLAGS) $< -o $@ $(IR_OBJECTS)
 
 # Step 3: Convert .S to .o using msp430-gcc (Assembly -> Object)
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.S
@@ -79,7 +79,7 @@ create_build_dirs:
 	@$(foreach build_folder,$(BUILD_FOLDERS), mkdir -p $(build_folder))
 	@rm -Rf mkdir
 
-export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH)
+export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH):$LD_LIBRARY_PATH
 
 flash: $(TARGET_APP).hex
-	@$(MSP_FLASHER_PATH)/MSP430Flasher -n msp430fr6989 -w $(TARGET_APP).hex -v $(TARGET_APP).hex -z [VCC,RESET]
+	@./flash.sh -n $(MSP_DEVICE) -w ../$(TARGET_APP).hex -v ../$(TARGET_APP).hex -z [VCC,RESET]

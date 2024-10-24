@@ -4,7 +4,7 @@
         {
             "label": "Upload Target to MSP",
             "type": "shell",
-            "command": "cd MSPFlasher* ; ./MSP430Flasher -w ../build/msp.hex -v -g -z [VCC]",
+            "command": "make flash",
             "group": "none",
             "presentation": {
                 "reveal": "always",
