@@ -39,6 +39,7 @@ default: create_build_dirs $(TARGET_APP).hex
 $(BUILD_DIR)/%.ll : %.c
 	@echo "C		$< -> $@"
 	@$(IR_TOOLCHAIN)/clang $(CCFLAGS) $< -o $@
+	@cp $@ $@.keep
 
 # Step 1: use clang++ to generate .ll from headers (C++ -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.cpp %.h $(ALL_DEPS)
@@ -54,6 +55,7 @@ $(BUILD_DIR)/%.ll : %.cpp $(ALL_DEPS)
 $(BUILD_DIR)/%.S: $(BUILD_DIR)/%.ll
 	@echo "LLC		$< -> $@"
 	@$(IR_TOOLCHAIN)/llc $(LLCFLAGS) $< -o $@ $(IR_OBJECTS)
+	@cp $@ $@.keep
 
 # Step 3: Convert .S to .o using msp430-gcc (Assembly -> Object)
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.S
