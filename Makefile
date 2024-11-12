@@ -61,15 +61,17 @@ $(BUILD_DIR)/%.ll : $(BUILD_DIR)/%.ll
 	@echo "IR2MIR		$< -> $@"
 	@$(IR_TOOLCHAIN)/ir2mir $(BCFLAGS) $< -o $@ $(IR_OBJECTS)
 
-# Step 3: Convert .ll to .S using llc (LLVM IR -> Assembly)
+# Step 2: Convert .ll to .S using ir2mir (LLVM IR -> Assembly)
 $(BUILD_DIR)/%.S : $(BUILD_DIR)/%.ll
-	@echo "LLC		$< -> $@"
-	@$(IR_TOOLCHAIN)/llc $(LLCFLAGS) $< -o $@ $(IR_OBJECTS)
+#@echo "LLC		$< -> $@"
+#@$(IR_TOOLCHAIN)/llc $(LLCFLAGS) $< -o $@ $(IR_OBJECTS)
+	@echo "IR2MIR		$< -> $@"
+	@$(IR_TOOLCHAIN)/ir2mir $(BCFLAGS) $< -o $@ $(IR_OBJECTS)
 
 # Step 3: Convert .S to .o using msp430-gcc (Assembly -> Object)
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.S
 	@echo "ASM		$< -> $@"
-	@$(CROSS_COMPILER)-g++ $(ASMFLAGS) -c $< -o $@ $(ASM_OBJECTS)
+	@$(CROSS_COMPILER)-gcc $(ASMFLAGS) -c $< -o $@ $(ASM_OBJECTS)
 
 # Step 4: Link .elf file from all .o files (Object -> ELF)
 $(TARGET_APP).elf : $(OBJECTS)
