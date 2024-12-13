@@ -105,8 +105,8 @@ export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH):$LD_LIBRARY_PATH
 flash: $(TARGET_APP).hex
 	@./flash.sh -n $(MSP_DEVICE) -w ../$(TARGET_APP).hex -v ../$(TARGET_APP).hex -z [VCC,RESET]
 
-analyse: default analyse2
+analyse: default $(TARGET_APP).S
 
-analyse2:
+$(TARGET_APP).S:
 	@echo "IR2MIR		$(TARGET_APP).ll -> $(TARGET_APP).S"
 	@$(IR_TOOLCHAIN)/ir2mir -dump-file=$(Target_APP).elf.dump $(TARGET_APP).ll -o $@
