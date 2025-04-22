@@ -6,9 +6,7 @@ MSP_DEVICE=msp430fr5994
 
 ASMFLAGS=-Wall -Werror -Og  -gdwarf-3 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -I.
 
-CCFLAGS=-D__MSP430F5529__ -g -fno-limit-debug-info -S -emit-llvm --target=msp430 -fno-sanitize=cfi -Wall -I$(MSP_INCLUDES) -I.
-
-LLASMFLAGS=-D__MSP430F5529__ -g -fno-limit-debug-info --target=msp430 -fno-sanitize=cfi -Wall -I$(MSP_INCLUDES) -I.
+CCFLAGS=-D__MSP430F5529__ -S -emit-llvm --target=msp430 -fno-sanitize=cfi -Wall -I$(MSP_INCLUDES) -I.
 
 BCFLAGS=-march=msp430
 
@@ -56,19 +54,19 @@ default: create_build_dirs $(TARGET_APP).hex $(TARGET_APP).ll
 $(BUILD_DIR)/%.ll : %.c
 	@echo "C		$< -> $@"
 	@$(IR_TOOLCHAIN)/clang $(CCFLAGS) $< -o $@
-	@$(IR_TOOLCHAIN)/clang $(CCFLAGS) $< -o $@.dbg
+	@$(IR_TOOLCHAIN)/clang $(CCFLAGS) -g -fno-limit-debug-info $< -o $@.dbg
 
 # Step 1: use clang++ to generate .ll from headers (C++ -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.cpp %.h $(ALL_DEPS)
 	@echo "CXX		$< -> $@"w
 	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) -c $< -o $@
-	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) $< -o $@.dbg
+	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) -g -fno-limit-debug-info $< -o $@.dbg
 
 # Step 1: use clang++ to generate .ll from .c++ (C++ -> LLVM IR)
 $(BUILD_DIR)/%.ll : %.cpp $(ALL_DEPS)
 	@echo "CXX		$< -> $@"
 	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) -c $< -o $@
-	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) $< -o $@.dbg
+	@$(IR_TOOLCHAIN)/clang++ $(CCFLAGS) -g -fno-limit-debug-info $< -o $@.dbg
 
 # Step 2: Convert .ll to .S using ir2mir (LLVM IR -> Assembly)
 $(BUILD_DIR)/%.S : $(BUILD_DIR)/%.ll
@@ -78,7 +76,7 @@ $(BUILD_DIR)/%.S : $(BUILD_DIR)/%.ll
 # Step 3: Convert .S to .o using msp430-gcc (Assembly -> Object)
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.S
 	@echo "ASM		$< -> $@"
-	@$(IR_TOOLCHAIN)/clang $(LLASMFLAGS) -c $< -o $@ $(ASM_OBJECTS)
+	@$(CROSS_COMPILER)-gcc $(ASMFLAGS) -c $< -o $@ $(ASM_OBJECTS)
 
 $(TARGET_APP).ll : $(INTERMEDIATES)
 	@echo "LLVM-LINK	$(INTERMEDIATES) -> $@"
@@ -87,12 +85,12 @@ $(TARGET_APP).ll : $(INTERMEDIATES)
 
 # Step 4: Link .elf file from all .o files (Object -> ELF)
 $(TARGET_APP).elf : $(OBJECTS)
-	@echo "LINK		$(OBJECTS) -> $@"
+	@echo "LD		$(OBJECTS) -> $@"
 	@$(CROSS_COMPILER)-gcc $(LDFLAGS) -o $@ $(OBJECTS)
 
 # Step 5: Create flashable .hex from .elf (ELF -> HEX)
 $(TARGET_APP).hex : $(TARGET_APP).elf
-	@echo "OBJECT-DUMP	$@"
+	@echo "OC		$@"
 	@$(CROSS_COMPILER)-objcopy -O ihex $< $@
 	@$(CROSS_COMPILER)-objdump -D $< > $<.dump
 

@@ -18,7 +18,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "compiledb make",
+            "command": "make",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -28,7 +28,7 @@
         {
             "label": "clean",
             "type": "shell",
-            "command": "make clean ; rm compile_commands.json",
+            "command": "make clean",
             "problemMatcher": [],
             "group": {
                 "kind": "build"
