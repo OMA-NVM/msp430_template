@@ -4,15 +4,15 @@ MSP_FLASHER_PATH=./MSPFlasher_1.3.20
 MSP_INCLUDES=msp430-gcc/include
 MSP_DEVICE=msp430fr5994
 
-ASMFLAGS=-Wall -Werror -Og  -gdwarf-3 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -I.
+ASMFLAGS=-Wall -Werror -Og -gdwarf-4 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -I.
 
-CCFLAGS=-D__MSP430F5529__ -S -emit-llvm --target=msp430 -fno-sanitize=cfi -Wall -I$(MSP_INCLUDES) -I.
+CCFLAGS=-D__MSP430F5529__ -Og -S -gdwarf-4 -gstrict-dwarf -fno-dwarf2-cfi-asm -emit-llvm --target=msp430 -Wall -I$(MSP_INCLUDES) -I.
 
 BCFLAGS=-march=msp430
 
-LLCFLAGS=-march=msp430
+LLCFLAGS=--dwarf-version=4 --strict-dwarf  -march=msp430
 
-LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gdwarf-3 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
+LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gdwarf-4 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
 
 MODULES=src
 BUILD_DIR=build
@@ -71,7 +71,11 @@ $(BUILD_DIR)/%.ll : %.cpp $(ALL_DEPS)
 # Step 2: Convert .ll to .S using ir2mir (LLVM IR -> Assembly)
 $(BUILD_DIR)/%.S : $(BUILD_DIR)/%.ll
 	@echo "LLC		$< -> $@"
-	@$(IR_TOOLCHAIN)/llc $(BCFLAGS) $< -o $@
+	@$(IR_TOOLCHAIN)/llc $(LLCFLAGS) $< -o $@
+	@echo "SED		$@ -> $@"
+	@mv $@ $@.sed1
+	@sed -E 's/^[[:space:]]*\.file[[:space:]]+([0-9]+)[[:space:]]+"[^"]+"[[:space:]]+"([^"]+)"/.file \1 "\2"/' $@.sed1 > $@.sed2
+	@sed '/^[[:space:]]*\.cfi/d' $@.sed2 > $@
 
 # Step 3: Convert .S to .o using msp430-gcc (Assembly -> Object)
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.S
