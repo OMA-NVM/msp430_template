@@ -3,3 +3,4 @@ analysis*
 .DS_Store
 compile_commands.json
 .cache
+.vscode/settings.json
