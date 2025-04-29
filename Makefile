@@ -2,11 +2,16 @@ CROSS_COMPILER=./msp430-gcc/bin/msp430-elf
 IR_TOOLCHAIN=./../llvm-project/build/bin
 MSP_FLASHER_PATH=./MSPFlasher_1.3.20
 MSP_INCLUDES=msp430-gcc/include
-MSP_DEVICE=msp430fr5994
+MSP_DEVICE=msp430fr2433
 
-CCFLAGS=-Wall -Werror -Og -g -gdwarf-3 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -D __$(MSP_DEVICE)__ -mmcu=$(MSP_DEVICE) -I.
+WARNINGS=-Wall -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
+		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
-LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gdwarf-3 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
+WARNINGS_NILS=-Wall -Werror
+
+CCFLAGS=$(WARNINGS) -Og -g -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -D __$(MSP_DEVICE)__ -mmcu=$(MSP_DEVICE) -I.
+
+LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
 
 MODULES=src
 BUILD_DIR=build
