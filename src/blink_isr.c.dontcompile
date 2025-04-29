@@ -1,0 +1,21 @@
+#include <msp430.h>
+
+int main(void) {
+    WDTCTL = WDTPW | WDTHOLD;  // Stop WDT
+    PM5CTL0 &= ~LOCKLPM5;      // Disable the GPIO power-on default high-impedance mode
+                               // to activate previously configured port settings
+
+    P1DIR |= BIT0;  // set P1.0 as output
+    P1OUT &= ~BIT0; // clear P1.0
+
+    TA0CCTL0 = CCIE;
+    TA0CTL = TASSEL__ACLK + MC__UP + TAIE;  // without prescaler
+    // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
+    TA0CCR0 = 0x8000;  // 1s timer interval
+
+    __enable_interrupt();
+}
+void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) TIMER0_A0_ISR(void) {
+    P1OUT ^= BIT0;    // blink LED
+    TA0CTL |= TACLR;  // reset timer value
+}

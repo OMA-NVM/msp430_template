@@ -263,49 +263,19 @@ void vPortYield(void) {
  * but could alternatively use the watchdog timer or timer 1.
  */
 static void prvSetupTimerInterrupt(void) {
-// #if defined(__MSP430FR5994__)
-    /* Ensure the timer is stopped. */
-    TA0CTL = 0;
+    WDTCTL = WDTPW | WDTHOLD;  // Stop WDT
+    PM5CTL0 &= ~LOCKLPM5;      // Disable the GPIO power-on default high-impedance mode
+                               // to activate previously configured port settings
 
-    /* Run the timer of the ACLK. */
-    TA0CTL = TASSEL_1;
+    P1DIR |= BIT0;  // set P1.0 as output
+    P1OUT &= ~BIT0; // clear P1.0
 
-    /* Clear everything to start with. */
-    TA0CTL |= TACLR;
-
-    /* Set the compare match value according to the tick rate we want. */
-    TA0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;
-
-    /* Enable the interrupts. */
     TA0CCTL0 = CCIE;
+    TA0CTL = TASSEL__ACLK + MC__UP + TAIE;  // without prescaler
+    // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
+    TA0CCR0 = 0x8000;  // 1s timer interval
 
-    /* Start up clean. */
-    TA0CTL |= TACLR;
-
-    /* Up mode. */
-    TA0CTL |= MC_1;
-// #else
-//     /* Ensure the timer is stopped. */
-//     TACTL = 0;
-
-//     /* Run the timer of the ACLK. */
-//     TACTL = TASSEL_1;
-
-//     /* Clear everything to start with. */
-//     TACTL |= TACLR;
-
-//     /* Set the compare match value according to the tick rate we want. */
-//     TACCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;
-
-//     /* Enable the interrupts. */
-//     TACCTL0 = CCIE;
-
-//     /* Start up clean. */
-//     TACTL |= TACLR;
-
-//     /* Up mode. */
-//     TACTL |= MC_1;
-// #endif
+    __enable_interrupt();
 }
 /*-----------------------------------------------------------*/
 
@@ -321,8 +291,11 @@ static void prvSetupTimerInterrupt(void) {
  * the context is saved at the start of vPortYieldFromTick().  The tick
  * count is incremented after the context is saved.
  */
-interrupt(TIMER0_A0_VECTOR) void prvTickISR(void) __attribute__((naked));
-interrupt(TIMER0_A0_VECTOR) void prvTickISR(void) {
+void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) __attribute__((naked));
+void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) {
+    P1OUT ^= BIT0;    // blink LED
+    TA0CTL |= TACLR;  // reset timer value
+
     /* Save the context of the interrupted task. */
     portSAVE_CONTEXT();
 

@@ -1,19 +1,30 @@
-// #include "msp430-gcc/include/msp430fr5994.h"
 #include "FreeRTOS.h"
+#include "task.h"
+
+void blink(void *pvParams) {
+    TickType_t previousWakeTime = 0;
+    // P1OUT ^= BIT0;  // blink LED
+    for (;;) {
+        P1OUT ^= BIT0;  // blink LED
+        vTaskDelay(1);
+        // xTaskDelayUntil(&previousWakeTime, 1);
+    }
+}
+void vApplicationIdleHook(){
+        // volatile unsigned int i;            // volatile to prevent optimization
+
+        // P1OUT ^= 0x01;                      // Toggle P1.0 using exclusive-OR
+
+        // i = 50000;                          // SW Delay
+        // do i--;
+        // while(i != 0);
+}
 
 int main(void) {
-    WDTCTL = WDTPW | WDTHOLD;               // Stop watchdog timer
-    PM5CTL0 &= ~LOCKLPM5;                   // Disable the GPIO power-on default high-impedance mode
-                                            // to activate previously configured port settings
-    P1DIR |= 0x01;                          // Set P1.0 to output direction
+    // xTaskCreate(blink, "blink", 1024, NULL, tskIDLE_PRIORITY+1, NULL);
 
-    for(;;) {
-        volatile unsigned int i;            // volatile to prevent optimization
+    vTaskStartScheduler();
 
-        P1OUT ^= 0x01;                      // Toggle P1.0 using exclusive-OR
-
-        i = 50000;                          // SW Delay
-        do i--;
-        while(i != 0);
-    }
+    __no_operation();  // this should never be reached
+    for (;;);
 }
