@@ -263,23 +263,18 @@ void vPortYield(void) {
  * but could alternatively use the watchdog timer or timer 1.
  */
 static void prvSetupTimerInterrupt(void) {
-    WDTCTL = WDTPW | WDTHOLD;  // Stop WDT
-    PM5CTL0 &= ~LOCKLPM5;      // Disable the GPIO power-on default high-impedance mode
-                               // to activate previously configured port settings
-
-    P1DIR |= BIT0;   // set P1.0 as output
-    P1OUT &= ~BIT0;  // clear P1.0
-
-#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
+#if defined(__MSP430_HAS_T0A3__)
     TA0CCTL0 = CCIE;
     TA0CTL = TASSEL__ACLK + MC__UP + TAIE;  // without prescaler
     // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
     TA0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;  // 1s timer interval
-#elif defined(__msp430fr2355__)
+#elif defined(__MSP430_HAS_TB0__)
     TB0CCTL0 = CCIE;
     TB0CTL = TBSSEL__ACLK + MC__UP + TBIE;  // without prescaler
     // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
     TB0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;  // 1s timer interval
+#else
+#error "No clock setup"
 #endif
     __enable_interrupt();
 }
@@ -298,19 +293,24 @@ static void prvSetupTimerInterrupt(void) {
  * count is incremented after the context is saved.
  */
 
-#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
+#if defined(__MSP430_HAS_T0A3__)
 void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) __attribute__((naked));
 void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) {
-#elif defined(__msp430fr2355__)
+#elif defined(__MSP430_HAS_TB0__)
 void __attribute__((__interrupt__(TIMER0_B0_VECTOR))) prvTickISR(void) __attribute__((naked));
 void __attribute__((__interrupt__(TIMER0_B0_VECTOR))) prvTickISR(void) {
+#else
+#error "No clock setup"
 #endif
-    P1OUT ^= BIT0;  // blink LED
 
-#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
+    // P1OUT ^= BIT0;  // blink LED
+
+#if defined(__MSP430_HAS_T0A3__)
     TA0CTL |= TACLR;  // reset timer value
-#elif defined(__msp430fr2355__)
+#elif defined(__MSP430_HAS_TB0__)
     TB0CTL |= TBCLR;  // reset timer value
+#else
+#error "No clock setup"
 #endif
 
     /* Save the context of the interrupted task. */
