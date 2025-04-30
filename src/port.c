@@ -270,11 +270,17 @@ static void prvSetupTimerInterrupt(void) {
     P1DIR |= BIT0;   // set P1.0 as output
     P1OUT &= ~BIT0;  // clear P1.0
 
+#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
     TA0CCTL0 = CCIE;
     TA0CTL = TASSEL__ACLK + MC__UP + TAIE;  // without prescaler
     // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
     TA0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;  // 1s timer interval
-
+#elif defined(__msp430fr2355__)
+    TB0CCTL0 = CCIE;
+    TB0CTL = TBSSEL__ACLK + MC__UP + TBIE;  // without prescaler
+    // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
+    TB0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;  // 1s timer interval
+#endif
     __enable_interrupt();
 }
 /*-----------------------------------------------------------*/
@@ -291,10 +297,21 @@ static void prvSetupTimerInterrupt(void) {
  * the context is saved at the start of vPortYieldFromTick().  The tick
  * count is incremented after the context is saved.
  */
+
+#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
 void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) __attribute__((naked));
 void __attribute__((__interrupt__(TIMER0_A0_VECTOR))) prvTickISR(void) {
-    P1OUT ^= BIT0;    // blink LED
+#elif defined(__msp430fr2355__)
+void __attribute__((__interrupt__(TIMER0_B0_VECTOR))) prvTickISR(void) __attribute__((naked));
+void __attribute__((__interrupt__(TIMER0_B0_VECTOR))) prvTickISR(void) {
+#endif
+    P1OUT ^= BIT0;  // blink LED
+
+#if defined(__msp430fr2433__) || defined(__msp430fr2476__) || defined(__msp430fr5994__)
     TA0CTL |= TACLR;  // reset timer value
+#elif defined(__msp430fr2355__)
+    TB0CTL |= TBCLR;  // reset timer value
+#endif
 
     /* Save the context of the interrupted task. */
     portSAVE_CONTEXT();

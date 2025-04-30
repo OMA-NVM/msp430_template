@@ -2,7 +2,7 @@ CROSS_COMPILER=./msp430-gcc/bin/msp430-elf
 IR_TOOLCHAIN=./../llvm-project/build/bin
 MSP_FLASHER_PATH=./MSPFlasher_1.3.20
 MSP_INCLUDES=msp430-gcc/include
-MSP_DEVICE=msp430fr2433
+MSP_DEVICE=msp430fr2476
 
 WARNINGS=-Wall -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
