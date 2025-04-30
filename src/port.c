@@ -267,13 +267,13 @@ static void prvSetupTimerInterrupt(void) {
     PM5CTL0 &= ~LOCKLPM5;      // Disable the GPIO power-on default high-impedance mode
                                // to activate previously configured port settings
 
-    P1DIR |= BIT0;  // set P1.0 as output
-    P1OUT &= ~BIT0; // clear P1.0
+    P1DIR |= BIT0;   // set P1.0 as output
+    P1OUT &= ~BIT0;  // clear P1.0
 
     TA0CCTL0 = CCIE;
     TA0CTL = TASSEL__ACLK + MC__UP + TAIE;  // without prescaler
     // TA0CTL = TASSEL__ACLK + MC__UP + TAIE +ID__8; // with 8x prescaler
-    TA0CCR0 = 0x8000;  // 1s timer interval
+    TA0CCR0 = portACLK_FREQUENCY_HZ / configTICK_RATE_HZ;  // 1s timer interval
 
     __enable_interrupt();
 }
