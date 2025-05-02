@@ -11,7 +11,7 @@
 //     // CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
 //     // CSCTL3 = DIVA__1 | DIVS__1 | DIVM__1;   // Set all dividers
 //     // CSCTL0_H = 0;                           // Lock CS registers
-    
+
 //     // Configure USCI_A0 for UART mode
 //     UCA0CTLW0 = UCSWRST;                    // Put eUSCI in reset
 //     UCA0CTLW0 |= UCSSEL__SMCLK;             // CLK = SMCLK
@@ -30,14 +30,15 @@
 //     while(!(UCA0IFG & UCTXIFG));
 //     UCA0TXBUF=c;
 // }
-
+void blink(void *);
+void setupHardware(void);
 
 void blink(void *pvParams) {
-    TickType_t previousWakeTime = 0;
-    // P1OUT ^= BIT0;  // blink LED
+    // TickType_t previousWakeTime = 0;
+
     volatile unsigned int i;  // volatile to prevent optimization
-    for (int j = 0; j < 2; j++) {
-        P1OUT ^= 0x01;  // Toggle P1.0 using exclusive-OR
+    for (int j = 0; j < 10; j++) {
+        P5OUT ^= BIT0;  // Toggle P5.1 using exclusive-OR (LED2 green)
 
         i = 50000;  // SW Delay
         do i--;
@@ -45,35 +46,56 @@ void blink(void *pvParams) {
     }
 
     for (;;) {
-        P1OUT ^= BIT0;  // blink LED
+        //TODO somehow this does not return
+        P1OUT ^= BIT0;  // blink LED 1
         vTaskDelay(1);
         // xTaskDelayUntil(&previousWakeTime, 1);
     }
 }
-void vApplicationIdleHook() {
-    // volatile unsigned int i;            // volatile to prevent optimization
 
-    // P1OUT ^= 0x01;                      // Toggle P1.0 using exclusive-OR
-
-    // i = 50000;                          // SW Delay
-    // do i--;
-    // while(i != 0);
-}
-
-void setupHardware(void){
+void setupHardware(void) {
     WDTCTL = WDTPW | WDTHOLD;  // Stop WDT
     PM5CTL0 &= ~LOCKLPM5;      // Disable the GPIO power-on default high-impedance mode
                                // to activate previously configured port settings
 
     P1DIR |= BIT0;   // set P1.0 as output
     P1OUT &= ~BIT0;  // clear P1.0
+
+    P4DIR |= BIT7;   // set P4.7 as output
+    P4OUT &= ~BIT7;  // clear P4.7
+
+    P5DIR |= BIT1;   // set P5.1 as output
+    P5OUT &= ~BIT1;  // clear P5.1
+
+    P5DIR |= BIT0;   // set P5.0 as output
+    P5OUT &= ~BIT0;  // clear P5.0
 }
 
 int main(void) {
-
     setupHardware();
 
-    xTaskCreate(blink, "blink", 1024, NULL, tskIDLE_PRIORITY + 1, NULL);
+    BaseType_t a = xTaskCreate(blink, "blink", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+
+    if (a == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)  // error case
+    {
+        volatile unsigned int i;  // volatile to prevent optimization
+        for (int j = 0; j < 10; j++) {
+            P5OUT ^= BIT1;  // Toggle P5.1 using exclusive-OR (LED2 red)
+
+            i = 50000;  // SW Delay
+            do i--;
+            while (i != 0);
+        }
+    } else {                      // no error creating
+        volatile unsigned int i;  // volatile to prevent optimization
+        for (int j = 0; j < 10; j++) {
+            P4OUT ^= BIT7;  // Toggle P1.0 using exclusive-OR (LED1)
+
+            i = 50000;  // SW Delay
+            do i--;
+            while (i != 0);
+        }
+    }
 
     vTaskStartScheduler();
 
