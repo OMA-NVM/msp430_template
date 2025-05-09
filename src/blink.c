@@ -47,8 +47,15 @@ void blink(void *pvParams) {
 
     for (;;) {
         //TODO somehow this does not return
-        P1OUT ^= BIT0;  // blink LED 1
-        vTaskDelay(1);
+        volatile unsigned int i;  // volatile to prevent optimization
+        for (int j = 0; j < 10; j++) {
+            P1OUT ^= BIT0;  // Toggle P1.0 using exclusive-OR (LED1)
+
+            i = 50000;  // SW Delay
+            do i--;
+            while (i != 0);
+        }
+        vTaskDelay(0);
         // xTaskDelayUntil(&previousWakeTime, 1);
     }
 }
@@ -89,7 +96,7 @@ int main(void) {
     } else {                      // no error creating
         volatile unsigned int i;  // volatile to prevent optimization
         for (int j = 0; j < 10; j++) {
-            P4OUT ^= BIT7;  // Toggle P1.0 using exclusive-OR (LED1)
+            P4OUT ^= BIT7;  // Toggle P4.7 using exclusive-OR (LED2 blue)
 
             i = 50000;  // SW Delay
             do i--;

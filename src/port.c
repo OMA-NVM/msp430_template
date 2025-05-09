@@ -245,7 +245,7 @@ void vPortYield(void) {
      * msp430 places the status register onto the stack.  As this is a function
      * call and not an ISR we have to do this manually. */
     asm volatile("push    r2");
-    _DINT();
+    _disable_interrupts();
 
     /* Save the context of the current task. */
     portSAVE_CONTEXT();
@@ -276,7 +276,7 @@ static void prvSetupTimerInterrupt(void) {
 #else
 #error "No clock setup"
 #endif
-    __enable_interrupt();
+    _enable_interrupts();
 }
 /*-----------------------------------------------------------*/
 

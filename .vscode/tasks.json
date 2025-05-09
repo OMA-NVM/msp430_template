@@ -33,6 +33,12 @@
             "group": {
                 "kind": "build"
             }
+        },
+        {
+            "label": "debug",
+            "type": "shell",
+            "command": "make debug",
+            "problemMatcher": []
         }
     ]
 }

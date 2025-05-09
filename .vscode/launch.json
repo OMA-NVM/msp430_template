@@ -8,16 +8,12 @@
             "name": "C++ Remote Debug",
             "type": "cppdbg",
             "request": "launch",
-            "miDebuggerPath": "${env:HOME}/ti/msp430-gcc/bin/msp430-elf-gdb",
+            "miDebuggerPath": "${workspaceRoot}/msp430-gcc/bin/msp430-elf-gdb",
             "miDebuggerServerAddress": "localhost:2000",
-            "program": "${command:cmake.launchTargetPath}",
-            "debugServerPath": "${workspaceFolder}/mspdebug.sh",
-            "debugServerArgs": "tilib \"gdb\"",
-            "additionalSOLibSearchPath": "${env:HOME}/ti/msp430-gcc/bin",
-            "cwd": ".",
-            "linux": {
-                "MIMode": "gdb"
-            }
+            "program": "${workspaceRoot}/build/msp.elf",
+            "additionalSOLibSearchPath": "${workspaceRoot}/msp430-gcc/bin",
+            "cwd": "${workspaceRoot}",
+            // "preLaunchTask": "debug"
         }
     ]
 }

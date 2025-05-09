@@ -35,7 +35,7 @@ default: create_build_dirs $(TARGET_APP).hex
 
 $(TARGET_APP).hex: $(TARGET_APP).elf
 	@echo "OC		$@"
-	@$(CROSS_COMPILER)-objcopy -O ihex $< $@
+	@$(CROSS_COMPILER)-objcopy --debugging -O ihex $< $@
 
 $(TARGET_APP).elf: $(OBJECTS)
 	@echo "LD		$@"
@@ -71,3 +71,7 @@ export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH):$LD_LIBRARY_PATH
 
 flash: $(TARGET_APP).hex
 	@./flash.sh -n $(MSP_DEVICE) -w ../$(TARGET_APP).hex -v ../$(TARGET_APP).hex -z [VCC,RESET]
+
+debug: clean create_build_dirs $(TARGET_APP).elf
+	@./mspdebug.sh tilib "prog $(TARGET_APP).elf"
+	@./mspdebug.sh tilib "gdb"
