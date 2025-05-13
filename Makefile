@@ -96,7 +96,7 @@ $(TARGET_APP).elf : $(OBJECTS)
 $(TARGET_APP).hex : $(TARGET_APP).elf
 	@echo "OC		$@"
 	@$(CROSS_COMPILER)-objcopy -O ihex $< $@
-	@$(CROSS_COMPILER)-objdump -D $< > $<.dump
+	@$(CROSS_COMPILER)-objdump -D -l $< > $<.dump
 
 .PHONY: clean create_build_dirs flash
 
