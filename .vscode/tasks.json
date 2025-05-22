@@ -35,7 +35,16 @@
             }
         },
         {
-            "label": "debug",
+            "label": "clean+build+flash",
+            "type": "shell",
+            "command": "make clean && make && make flash",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "start debug server",
             "type": "shell",
             "command": "make debug",
             "problemMatcher": []

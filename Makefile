@@ -1,17 +1,17 @@
 CROSS_COMPILER=./msp430-gcc/bin/msp430-elf
-IR_TOOLCHAIN=./../llvm-project/build/bin
-MSP_FLASHER_PATH=./MSPFlasher_1.3.20
+# IR_TOOLCHAIN=./../llvm-project/build/bin
+# MSP_FLASHER_PATH=./MSPFlasher_1.3.20
 MSP_INCLUDES=msp430-gcc/include
-MSP_DEVICE=msp430fr2476
+MSP_DEVICE=msp430fr5994
+MSP_DEBUG_PATH=./mspdebug-master
+MSP_DEBUG=DYLD_LIBRARY_PATH="${MSP_DEBUG_PATH}/libs" ${MSP_DEBUG_PATH}/mspdebug
 
 WARNINGS=-Wall -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
-WARNINGS_NILS=-Wall -Werror
+CCFLAGS=$(WARNINGS) -O0 -ggdb3 -gstrict-dwarf -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -D __$(MSP_DEVICE)__ -mmcu=$(MSP_DEVICE) -I.
 
-CCFLAGS=$(WARNINGS) -Og -g -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group -I$(MSP_INCLUDES) -D __$(MSP_DEVICE)__ -mmcu=$(MSP_DEVICE) -I.
-
-LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
+LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -O0 -ggdb3 -gstrict-dwarf $(WARNINGS) -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
 
 MODULES=src
 BUILD_DIR=build
@@ -31,11 +31,12 @@ BUILD_FOLDERS=$(dir $(OBJECTS))
 
 TARGET_APP=$(BUILD_DIR)/msp
 
-default: create_build_dirs $(TARGET_APP).hex
+# default: create_build_dirs $(TARGET_APP).hex
+default: create_build_dirs $(TARGET_APP).elf
 
-$(TARGET_APP).hex: $(TARGET_APP).elf
-	@echo "OC		$@"
-	@$(CROSS_COMPILER)-objcopy --debugging -O ihex $< $@
+# $(TARGET_APP).hex: $(TARGET_APP).elf
+# 	@echo "OC		$@"
+# 	@$(CROSS_COMPILER)-objcopy --debugging -O ihex $< $@
 
 $(TARGET_APP).elf: $(OBJECTS)
 	@echo "LD		$@"
@@ -57,7 +58,7 @@ $(BUILD_DIR)/%.o : %.S $(ALL_DEPS)
 	@echo "ASM		$< -> $@"
 	@$(CROSS_COMPILER)-g++ $(CCFLAGS) -c $< -o $@
 
-.PHONY: clean create_build_dirs flash
+.PHONY: clean create_build_dirs flash debug
 
 clean:
 	@rm -R -f build
@@ -67,11 +68,14 @@ create_build_dirs:
 	@$(foreach build_folder,$(BUILD_FOLDERS), mkdir -p $(build_folder))
 	@rm -Rf mkdir
 
-export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH):$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH = $(MSP_FLASHER_PATH):$LD_LIBRARY_PATH
 
-flash: $(TARGET_APP).hex
-	@./flash.sh -n $(MSP_DEVICE) -w ../$(TARGET_APP).hex -v ../$(TARGET_APP).hex -z [VCC,RESET]
+# flash: $(TARGET_APP).hex
+# 	@./flash.sh -n $(MSP_DEVICE) -w ../$(TARGET_APP).hex -v ../$(TARGET_APP).hex -z [VCC,RESET]
 
-debug: clean create_build_dirs $(TARGET_APP).elf
-	@./mspdebug.sh tilib "prog $(TARGET_APP).elf"
-	@./mspdebug.sh tilib "gdb"
+flash: $(TARGET_APP).elf
+	@${MSP_DEBUG} tilib "prog ${TARGET_APP}.elf"
+
+debug: clean create_build_dirs ${TARGET_APP}.elf
+	@${MSP_DEBUG} tilib "prog ${TARGET_APP}.elf"
+	@${MSP_DEBUG} tilib "gdb"

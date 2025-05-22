@@ -253,6 +253,8 @@ void vPortYield(void) {
     /* Switch to the highest priority task that is ready to run. */
     vTaskSwitchContext();
 
+    _enable_interrupts();
+    // asm volatile("pop    r2");
     /* Restore the context of the new task. */
     portRESTORE_CONTEXT();
 }

@@ -2,16 +2,16 @@
 
 import serial
 
-DEVICE = '/dev/tty.usbmodem113201'
+DEVICE = '/dev/tty.usbmodem113203'
+ser = serial.Serial(DEVICE, timeout = 600)
+# ser = serial.Serial()
+# ser.port = DEVICE
+# ser.baudrate = 115200
+# ser.timeout = 600
+# ser.rts = False
+# ser.dtr = False
 
-ser = serial.Serial()
-ser.port = DEVICE
-# ser.baudrate = 1500000
-ser.timeout = 600
-ser.rts = False
-ser.dtr = False
-
-ser.open()
+# ser.open()
 
 while True:
     x = ser.readline()

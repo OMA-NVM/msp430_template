@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C++ Remote Debug",
+            "name": "mspdebug gdb",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerPath": "${workspaceRoot}/msp430-gcc/bin/msp430-elf-gdb",

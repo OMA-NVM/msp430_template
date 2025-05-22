@@ -1,9 +1,11 @@
+// FreeRTOSv202406.01-LTS
 #include "FreeRTOS.h"
 #include "task.h"
+#include "UART.h"
 
 // void uartInitialize() {
 //     P2SEL0 &= ~(BIT0 | BIT1);
-//     P2SEL1 |= BIT0 | BIT1;                  // USCI_A0 UART operation
+//     P2SEL1 |= BIT0 | BIT1;  // USCI_A0 UART operation
 
 //     // // Startup clock system with max DCO setting ~8MHz
 //     // CSCTL0_H = CSKEY_H;                     // Unlock CS registers
@@ -13,51 +15,54 @@
 //     // CSCTL0_H = 0;                           // Lock CS registers
 
 //     // Configure USCI_A0 for UART mode
-//     UCA0CTLW0 = UCSWRST;                    // Put eUSCI in reset
-//     UCA0CTLW0 |= UCSSEL__SMCLK;             // CLK = SMCLK
+//     UCA0CTLW0 = UCSWRST;         // Put eUSCI in reset
+//     UCA0CTLW0 |= UCSSEL__SMCLK;  // CLK = SMCLK
 //     // Baud Rate calculation
 //     // 8000000/(16*9600) = 52.083
 //     // Fractional portion = 0.083
 //     // User's Guide Table 21-4: UCBRSx = 0x04
 //     // UCBRFx = int ( (52.083-52)*16) = 1
-//     UCA0BRW = 52;                           // 8000000/16/9600
+//     UCA0BRW = 52;  // 8000000/16/9600
 //     UCA0MCTLW |= UCOS16 | UCBRF_1 | 0x4900;
-//     UCA0CTLW0 &= ~UCSWRST;                  // Initialize eUSCI
-//     UCA0IE |= UCRXIE;                       // Enable USCI_A0 RX interrupt
+//     UCA0CTLW0 &= ~UCSWRST;  // Initialize eUSCI
+//     UCA0IE |= UCRXIE;       // Enable USCI_A0 RX interrupt
 // }
 // void send(char c) {
 //     // Wait for previos action to be finished
-//     while(!(UCA0IFG & UCTXIFG));
-//     UCA0TXBUF=c;
+//     while (!(UCA0IFG & UCTXIFG));
+//     UCA0TXBUF = c;
 // }
 void blink(void *);
 void setupHardware(void);
 
 void blink(void *pvParams) {
-    // TickType_t previousWakeTime = 0;
+    TickType_t previousWakeTime = 0;
 
-    volatile unsigned int i;  // volatile to prevent optimization
-    for (int j = 0; j < 10; j++) {
-        P5OUT ^= BIT0;  // Toggle P5.1 using exclusive-OR (LED2 green)
+    // volatile unsigned int i;  // volatile to prevent optimization
+    // for (int j = 0; j < 10; j++) {
+    //     P5OUT ^= BIT0;  // Toggle P5.1 using exclusive-OR (LED2 green)
 
-        i = 50000;  // SW Delay
-        do i--;
-        while (i != 0);
-    }
+    //     i = 50000;  // SW Delay
+    //     do i--;
+    //     while (i != 0);
+    // }
 
     for (;;) {
-        //TODO somehow this does not return
-        volatile unsigned int i;  // volatile to prevent optimization
-        for (int j = 0; j < 10; j++) {
-            P1OUT ^= BIT0;  // Toggle P1.0 using exclusive-OR (LED1)
+        // TODO somehow this does not come back
+        //  volatile unsigned int i;  // volatile to prevent optimization
+        //  for (int j = 0; j < 10; j++) {
+        P1OUT ^= BIT0;  // Toggle P1.0 using exclusive-OR (LED1)
 
-            i = 50000;  // SW Delay
-            do i--;
-            while (i != 0);
-        }
-        vTaskDelay(0);
-        // xTaskDelayUntil(&previousWakeTime, 1);
+        //     i = 50000;  // SW Delay
+        //     do i--;
+        //     while (i != 0);
+        // }
+        // vTaskDelay(0);
+        xTaskDelayUntil(&previousWakeTime, 10);
     }
+}
+
+void vApplicationIdleHook() {
 }
 
 void setupHardware(void) {
@@ -76,10 +81,31 @@ void setupHardware(void) {
 
     P5DIR |= BIT0;   // set P5.0 as output
     P5OUT &= ~BIT0;  // clear P5.0
+
+    uartInitialize();
+
+//   initGPIO();
+//   initClockTo16MHz();
+//   initUART();
+
+// #if UART_MODE == SMCLK_9600
+//     __bis_SR_register(LPM3_bits + GIE);       // Since ACLK is source, enter LPM3, interrupts enabled
+// #else
+//     __bis_SR_register(LPM0_bits + GIE);       // Since SMCLK is source, enter LPM0, interrupts enabled
+// #endif
+//   __no_operation();                         // For debugger
+
+
 }
 
 int main(void) {
     setupHardware();
+
+        while(true){
+    send('A');
+    send('\n');
+        // __delay_cycles(3);
+    }
 
     BaseType_t a = xTaskCreate(blink, "blink", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
