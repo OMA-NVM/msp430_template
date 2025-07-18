@@ -88,3 +88,8 @@ The following pages were used to help make this:
 [CMake with msp430 setup](https://github.com/descampsa/msp430-cmake)
 
 [Another CMake with msp430 setup](https://github.com/AlexanderSidorenko/msp-cmake)
+
+Install msp430 lib for the flasher on Linux:
+```
+sudo install -m0755 libmsp430.so /usr/lib
+```
