@@ -8,9 +8,9 @@ ASMFLAGS=-Wall -Werror -Og -gdwarf-4 -gstrict-dwarf -Wall -mcode-region=none -md
 
 CCFLAGS=-D__MSP430F5529__ -Og -S -gdwarf-4 -gstrict-dwarf -fno-dwarf2-cfi-asm -emit-llvm --target=msp430 -Wall -I$(MSP_INCLUDES) -I.
 
-BCFLAGS=-march=msp430
+BCFLAGS=-march=msp430x
 
-LLCFLAGS=--dwarf-version=4 --strict-dwarf  -march=msp430
+LLCFLAGS=--dwarf-version=4 --strict-dwarf -mtriple=msp430 -mcpu=msp430x
 
 LDFLAGS=-T $(MSP_INCLUDES)/$(MSP_DEVICE).ld -L $(MSP_INCLUDES) -Og -g -gdwarf-4 -gstrict-dwarf -Wall -mcode-region=none -mdata-region=none -mlarge -Wl,--gc-sections -Wl,--start-group -lgcc -lc -Wl,--end-group
 
